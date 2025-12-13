@@ -6,6 +6,7 @@ from api.mutations import (
     UpdateProject,
     CreateTask,
     UpdateTaskStatus,
+    AddTaskComment
 )
 
 
@@ -21,6 +22,7 @@ class Mutation(graphene.ObjectType):
     update_project = UpdateProject.Field()
     create_task = CreateTask.Field()
     update_task_status = UpdateTaskStatus.Field()
+    add_task_comment = AddTaskComment.Field()
 
 
 

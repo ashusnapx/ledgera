@@ -5,6 +5,8 @@ from projects.models import Project
 from tasks.models import Task
 from core.organization import get_organization_or_error
 from core.querysets import validate_project_belongs_to_org
+from comments.models import TaskComment
+from core.querysets import validate_task_belongs_to_org
 
 class CreateProject(graphene.Mutation):
     project = graphene.Field(ProjectType)
@@ -111,3 +113,29 @@ class UpdateTaskStatus(graphene.Mutation):
 
         return UpdateTaskStatus(task=task)
 
+class AddTaskComment(graphene.Mutation):
+    comment = graphene.Field(lambda: graphene.NonNull(graphene.String))
+
+    class Arguments:
+        organization_slug = graphene.String(required=True)
+        task_id = graphene.ID(required=True)
+        content = graphene.String(required=True)
+        author_email = graphene.String(required=True)
+
+    def mutate(self, info, organization_slug, task_id, content, author_email):
+        org = get_organization_or_error(organization_slug)
+
+        try:
+            task = Task.objects.get(id=task_id)
+        except Task.DoesNotExist:
+            raise Exception("Task not found")
+
+        validate_task_belongs_to_org(task, org)
+
+        comment = TaskComment.objects.create(
+            task=task,
+            content=content,
+            author_email=author_email,
+        )
+
+        return AddTaskComment(comment=comment.content)
