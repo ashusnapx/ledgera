@@ -5,11 +5,36 @@ import { UPDATE_TASK_STATUS } from "@/graphql/mutations";
 import { useMutation, useQuery } from "@apollo/client/react";
 import { CommentsPanel } from "./CommentsPanel";
 
+/* ================= TYPES ================= */
+
+interface Task {
+  id: string;
+  title: string;
+  status: "TODO" | "IN_PROGRESS" | "DONE";
+  assigneeEmail?: string;
+}
+
+interface GetTasksData {
+  tasks: Task[];
+}
+
+interface GetTasksVars {
+  organizationSlug: string;
+  projectId: string;
+}
+
+/* ================= COMPONENT ================= */
 
 export function TaskList({ projectId }: { projectId: string }) {
-  const { data, loading, error } = useQuery(GET_TASKS, {
-    variables: { organizationSlug: "acme", projectId },
-  });
+  const { data, loading, error } = useQuery<GetTasksData, GetTasksVars>(
+    GET_TASKS,
+    {
+      variables: {
+        organizationSlug: "acme",
+        projectId,
+      },
+    }
+  );
 
   const [updateStatus] = useMutation(UPDATE_TASK_STATUS);
 
@@ -18,18 +43,18 @@ export function TaskList({ projectId }: { projectId: string }) {
 
   return (
     <div className='mt-4 space-y-2'>
-      {data.tasks.map((task: any) => (
+      {data?.tasks.map((task) => (
         <div
           key={task.id}
-          className='p-3 bg-gray-50 rounded flex justify-between items-center'
+          className='p-3 bg-gray-50 rounded flex justify-between items-start'
         >
           <div>
             <p className='font-medium'>{task.title}</p>
             <p className='text-xs text-gray-500'>{task.assigneeEmail}</p>
-          </div>
-          <div>
+
             <CommentsPanel taskId={task.id} />
           </div>
+
           <select
             className='border rounded px-2 py-1 text-sm'
             value={task.status}
@@ -50,7 +75,7 @@ export function TaskList({ projectId }: { projectId: string }) {
                     },
                   },
                 },
-                refetchQueries: ["GetProjects"], // 👈 THIS LINE
+                refetchQueries: ["GetProjects"],
               });
             }}
           >

@@ -5,14 +5,40 @@ import { useState } from "react";
 import { GET_TASK_COMMENTS } from "@/graphql/queries";
 import { ADD_TASK_COMMENT } from "@/graphql/mutations";
 
+/* ================= TYPES ================= */
+
+interface TaskComment {
+  id: string;
+  content: string;
+  authorEmail: string;
+  createdAt: string;
+}
+
+interface GetTaskCommentsData {
+  taskComments: TaskComment[];
+}
+
+interface GetTaskCommentsVars {
+  organizationSlug: string;
+  taskId: string;
+}
+
+/* ================= COMPONENT ================= */
+
 export function CommentsPanel({ taskId }: { taskId: string }) {
   const [text, setText] = useState("");
   const [open, setOpen] = useState(false);
 
-  const { data, loading } = useQuery(GET_TASK_COMMENTS, {
-    variables: { organizationSlug: "acme", taskId },
-    skip: !open,
-  });
+  const { data, loading } = useQuery<GetTaskCommentsData, GetTaskCommentsVars>(
+    GET_TASK_COMMENTS,
+    {
+      variables: {
+        organizationSlug: "acme",
+        taskId,
+      },
+      skip: !open,
+    }
+  );
 
   const [addComment] = useMutation(ADD_TASK_COMMENT, {
     refetchQueries: ["GetTaskComments"],
@@ -29,13 +55,13 @@ export function CommentsPanel({ taskId }: { taskId: string }) {
 
       <div
         className={`transition-all duration-300 ease-out overflow-hidden ${
-          open ? "max-h-[500px] opacity-100" : "max-h-0 opacity-0"
+          open ? "max-h-125 opacity-100" : "max-h-0 opacity-0"
         }`}
       >
         <div className='mt-2 space-y-2'>
           {loading && <p className='text-xs text-gray-400'>Loading…</p>}
 
-          {data?.taskComments.map((c: any) => (
+          {data?.taskComments.map((c) => (
             <div key={c.id} className='text-sm bg-white border rounded p-2'>
               <p>{c.content}</p>
               <p className='text-xs text-gray-400 mt-1'>{c.authorEmail}</p>

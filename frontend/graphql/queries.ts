@@ -34,3 +34,26 @@ export const GET_TASK_COMMENTS = gql`
     }
   }
 `;
+
+export const CREATE_TASK = gql`
+  mutation CreateTask(
+    $organizationSlug: String!
+    $projectId: ID!
+    $title: String!
+    $assigneeEmail: String
+  ) {
+    createTask(
+      organizationSlug: $organizationSlug
+      projectId: $projectId
+      title: $title
+      assigneeEmail: $assigneeEmail
+    ) {
+      task {
+        id
+        title
+        status
+        assigneeEmail
+      }
+    }
+  }
+`;
