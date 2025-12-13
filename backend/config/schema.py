@@ -1,11 +1,12 @@
 import graphene
-from api.queries import ProjectQuery
+
+from api.queries import ProjectQuery, TaskQuery
 
 
-class Query(ProjectQuery, graphene.ObjectType):
+class Query(ProjectQuery, TaskQuery, graphene.ObjectType):
     health = graphene.String()
 
-    def resolve_health(root, info):
+    def resolve_health(self, info):
         return "ok"
 
 
