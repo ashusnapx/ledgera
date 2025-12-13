@@ -57,3 +57,13 @@ export const CREATE_TASK = gql`
     }
   }
 `;
+
+export const GET_ORGANIZATIONS = gql`
+  query {
+    organizations {
+      id
+      name
+      slug
+    }
+  }
+`;

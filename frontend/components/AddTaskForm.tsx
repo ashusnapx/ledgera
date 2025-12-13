@@ -3,9 +3,12 @@
 import { useState } from "react";
 import { useMutation } from "@apollo/client/react";
 import { CREATE_TASK } from "@/graphql/queries";
+import { useOrg } from "@/context/OrgContext";
 
 export function AddTaskForm({ projectId }: { projectId: string }) {
   const [title, setTitle] = useState("");
+  const { orgSlug } = useOrg();
+
   const [createTask] = useMutation(CREATE_TASK, {
     refetchQueries: ["GetTasks", "GetProjects"],
   });
@@ -18,7 +21,7 @@ export function AddTaskForm({ projectId }: { projectId: string }) {
 
         createTask({
           variables: {
-            organizationSlug: "acme",
+            organizationSlug: orgSlug,
             projectId,
             title,
           },

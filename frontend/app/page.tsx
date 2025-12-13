@@ -1,14 +1,16 @@
 "use client";
-
-
 import { GET_PROJECTS } from "@/graphql/queries";
 import { useQuery } from "@apollo/client/react";
 import { TaskList } from "@/components/TaskList";
 import { AddTaskForm } from "@/components/AddTaskForm";
+import { OrgSwitcher } from "@/components/OrgSwitcher";
+import { useOrg } from "@/context/OrgContext";
+
 
 export default function ProjectDashboard() {
+  const { orgSlug } = useOrg();
   const { data, loading, error } = useQuery(GET_PROJECTS, {
-    variables: { organizationSlug: "acme" },
+    variables: { organizationSlug: orgSlug },
   });
 
   if (loading) return <div className='p-6'>Loading projects...</div>;
@@ -17,6 +19,10 @@ export default function ProjectDashboard() {
 
   return (
     <main className='p-6 grid gap-4'>
+      <div className='p-4 flex justify-end'>
+        <OrgSwitcher />
+      </div>
+
       {data.projects.map((project: any) => (
         <div
           key={project.id}

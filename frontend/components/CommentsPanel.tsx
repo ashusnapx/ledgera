@@ -4,6 +4,7 @@ import { useQuery, useMutation } from "@apollo/client/react";
 import { useState } from "react";
 import { GET_TASK_COMMENTS } from "@/graphql/queries";
 import { ADD_TASK_COMMENT } from "@/graphql/mutations";
+import { useOrg } from "@/context/OrgContext";
 
 /* ================= TYPES ================= */
 
@@ -28,12 +29,13 @@ interface GetTaskCommentsVars {
 export function CommentsPanel({ taskId }: { taskId: string }) {
   const [text, setText] = useState("");
   const [open, setOpen] = useState(false);
+  const { orgSlug } = useOrg();
 
   const { data, loading } = useQuery<GetTaskCommentsData, GetTaskCommentsVars>(
     GET_TASK_COMMENTS,
     {
       variables: {
-        organizationSlug: "acme",
+        organizationSlug: orgSlug,
         taskId,
       },
       skip: !open,
@@ -75,7 +77,7 @@ export function CommentsPanel({ taskId }: { taskId: string }) {
 
               addComment({
                 variables: {
-                  organizationSlug: "acme",
+                  organizationSlug: orgSlug,
                   taskId,
                   content: text,
                   authorEmail: "user@acme.com",

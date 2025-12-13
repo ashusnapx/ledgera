@@ -4,6 +4,7 @@ import { GET_TASKS } from "@/graphql/queries";
 import { UPDATE_TASK_STATUS } from "@/graphql/mutations";
 import { useMutation, useQuery } from "@apollo/client/react";
 import { CommentsPanel } from "./CommentsPanel";
+import { useOrg } from "@/context/OrgContext";
 
 /* ================= TYPES ================= */
 
@@ -26,11 +27,13 @@ interface GetTasksVars {
 /* ================= COMPONENT ================= */
 
 export function TaskList({ projectId }: { projectId: string }) {
+  const { orgSlug } = useOrg();
+
   const { data, loading, error } = useQuery<GetTasksData, GetTasksVars>(
     GET_TASKS,
     {
       variables: {
-        organizationSlug: "acme",
+        organizationSlug: orgSlug,
         projectId,
       },
     }
@@ -61,7 +64,7 @@ export function TaskList({ projectId }: { projectId: string }) {
             onChange={(e) => {
               updateStatus({
                 variables: {
-                  organizationSlug: "acme",
+                  organizationSlug: orgSlug,
                   taskId: task.id,
                   status: e.target.value,
                 },
