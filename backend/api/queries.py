@@ -3,6 +3,7 @@ import graphene
 from api.types import ProjectType
 from core.organization import get_organization_or_error
 from core.querysets import projects_for_org
+from core.graphql_errors import graphql_error_from_exception
 
 from api.types import TaskType
 from projects.models import Project
@@ -62,3 +63,10 @@ class TaskCommentQuery(graphene.ObjectType):
         validate_task_belongs_to_org(task, org)
 
         return task.comments.all()
+
+def resolve_projects(self, info, organization_slug):
+    try:
+        org = get_organization_or_error(organization_slug)
+        return projects_for_org(org)
+    except Exception as exc:
+        raise graphql_error_from_exception(exc)
