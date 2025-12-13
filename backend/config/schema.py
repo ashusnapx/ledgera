@@ -1,6 +1,7 @@
 import graphene
 
-from api.queries import ProjectQuery, TaskQuery
+from api.queries import ProjectQuery, TaskQuery, TaskCommentQuery
+
 from api.mutations import (
     CreateProject,
     UpdateProject,
@@ -11,7 +12,7 @@ from api.mutations import (
 
 
 
-class Query(ProjectQuery, TaskQuery, graphene.ObjectType):
+class Query(ProjectQuery, TaskQuery, TaskCommentQuery, graphene.ObjectType):
     health = graphene.String()
 
     def resolve_health(self, info):

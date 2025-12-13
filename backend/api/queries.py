@@ -11,6 +11,9 @@ from core.querysets import (
     validate_project_belongs_to_org,
 )
 
+from api.types import TaskCommentType
+from tasks.models import Task
+from core.querysets import validate_task_belongs_to_org
 
 class ProjectQuery(graphene.ObjectType):
     projects = graphene.List(
@@ -41,3 +44,21 @@ class TaskQuery(graphene.ObjectType):
 
         return tasks_for_org(org).filter(project=project)
 
+class TaskCommentQuery(graphene.ObjectType):
+    task_comments = graphene.List(
+        TaskCommentType,
+        organization_slug=graphene.String(required=True),
+        task_id=graphene.ID(required=True),
+    )
+
+    def resolve_task_comments(self, info, organization_slug, task_id):
+        org = get_organization_or_error(organization_slug)
+
+        try:
+            task = Task.objects.get(id=task_id)
+        except Task.DoesNotExist:
+            raise Exception("Task not found")
+
+        validate_task_belongs_to_org(task, org)
+
+        return task.comments.all()

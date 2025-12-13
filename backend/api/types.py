@@ -14,6 +14,7 @@ class OrganizationType(DjangoObjectType):
 class ProjectType(DjangoObjectType):
     task_count = graphene.Int()
     completed_tasks = graphene.Int()
+    completion_rate = graphene.Float()
 
     class Meta:
         model = Project
@@ -31,6 +32,13 @@ class ProjectType(DjangoObjectType):
 
     def resolve_completed_tasks(self, info):
         return self.tasks.filter(status="DONE").count()
+
+    def resolve_completion_rate(self, info):
+        total = self.tasks.count()
+        if total == 0:
+            return 0.0
+        completed = self.tasks.filter(status="DONE").count()
+        return round((completed / total) * 100, 2)
 
 class TaskType(DjangoObjectType):
     class Meta:
