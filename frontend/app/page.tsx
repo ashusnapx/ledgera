@@ -3,6 +3,7 @@
 
 import { GET_PROJECTS } from "@/graphql/queries";
 import { useQuery } from "@apollo/client/react";
+import { TaskList } from "@/components/TaskList";
 
 export default function ProjectDashboard() {
   const { data, loading, error } = useQuery(GET_PROJECTS, {
@@ -23,6 +24,10 @@ export default function ProjectDashboard() {
           <div>
             <h2 className='font-semibold'>{project.name}</h2>
             <p className='text-sm text-gray-500'>{project.status}</p>
+          </div>
+
+          <div className='mt-2'>
+            <TaskList projectId={project.id} />
           </div>
 
           <div className='text-sm text-right'>
