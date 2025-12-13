@@ -4,6 +4,8 @@ import { useState } from "react";
 import { useMutation } from "@apollo/client/react";
 import { CREATE_TASK } from "@/graphql/queries";
 import { useOrg } from "@/context/OrgContext";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 export function AddTaskForm({ projectId }: { projectId: string }) {
   const [title, setTitle] = useState("");
@@ -15,6 +17,7 @@ export function AddTaskForm({ projectId }: { projectId: string }) {
 
   return (
     <form
+      className='flex gap-2'
       onSubmit={(e) => {
         e.preventDefault();
         if (!title.trim()) return;
@@ -25,33 +28,19 @@ export function AddTaskForm({ projectId }: { projectId: string }) {
             projectId,
             title,
           },
-          optimisticResponse: {
-            createTask: {
-              __typename: "CreateTask",
-              task: {
-                __typename: "TaskType",
-                id: "temp-id",
-                title,
-                status: "TODO",
-                assigneeEmail: "",
-              },
-            },
-          },
         });
 
         setTitle("");
       }}
-      className='flex gap-2 mt-2'
     >
-      <input
+      <Input
         value={title}
         onChange={(e) => setTitle(e.target.value)}
-        placeholder='New task title'
-        className='flex-1 border rounded px-2 py-1 text-sm'
+        placeholder='Add a task…'
+        className='h-8'
       />
-      <button className='bg-green-600 text-white px-3 rounded text-sm'>
-        + Add
-      </button>
+
+      <Button size='sm' variant={"outline"} className="cursor-pointer">Add</Button>
     </form>
   );
 }
