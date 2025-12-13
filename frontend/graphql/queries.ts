@@ -23,3 +23,14 @@ export const GET_TASKS = gql`
     }
   }
 `;
+
+export const GET_TASK_COMMENTS = gql`
+  query GetTaskComments($organizationSlug: String!, $taskId: ID!) {
+    taskComments(organizationSlug: $organizationSlug, taskId: $taskId) {
+      id
+      content
+      authorEmail
+      createdAt
+    }
+  }
+`;

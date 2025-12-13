@@ -18,3 +18,21 @@ export const UPDATE_TASK_STATUS = gql`
     }
   }
 `;
+
+export const ADD_TASK_COMMENT = gql`
+  mutation AddTaskComment(
+    $organizationSlug: String!
+    $taskId: ID!
+    $content: String!
+    $authorEmail: String!
+  ) {
+    addTaskComment(
+      organizationSlug: $organizationSlug
+      taskId: $taskId
+      content: $content
+      authorEmail: $authorEmail
+    ) {
+      comment
+    }
+  }
+`;

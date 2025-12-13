@@ -3,6 +3,8 @@
 import { GET_TASKS } from "@/graphql/queries";
 import { UPDATE_TASK_STATUS } from "@/graphql/mutations";
 import { useMutation, useQuery } from "@apollo/client/react";
+import { CommentsPanel } from "./CommentsPanel";
+
 
 export function TaskList({ projectId }: { projectId: string }) {
   const { data, loading, error } = useQuery(GET_TASKS, {
@@ -25,7 +27,9 @@ export function TaskList({ projectId }: { projectId: string }) {
             <p className='font-medium'>{task.title}</p>
             <p className='text-xs text-gray-500'>{task.assigneeEmail}</p>
           </div>
-
+          <div>
+            <CommentsPanel taskId={task.id} />
+          </div>
           <select
             className='border rounded px-2 py-1 text-sm'
             value={task.status}
@@ -48,7 +52,6 @@ export function TaskList({ projectId }: { projectId: string }) {
                 },
                 refetchQueries: ["GetProjects"], // 👈 THIS LINE
               });
-
             }}
           >
             <option value='TODO'>TODO</option>
