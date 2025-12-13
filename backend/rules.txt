@@ -1,0 +1,1 @@
+Every read/write operation MUST be scoped by organization_slug.
