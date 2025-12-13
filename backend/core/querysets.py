@@ -5,7 +5,10 @@ from core.exceptions import CrossOrganizationAccess
 
 
 def projects_for_org(org):
-    return Project.objects.filter(organization=org)
+    return Project.objects.filter(
+        organization=org
+    ).prefetch_related("tasks")
+
 
 
 def tasks_for_org(org):
