@@ -1,16 +1,12 @@
 import graphene
-from api.types import OrganizationType
-from organizations.models import Organization
+from api.queries import ProjectQuery
 
-class Query(graphene.ObjectType):
+
+class Query(ProjectQuery, graphene.ObjectType):
     health = graphene.String()
-    organizations = graphene.List(OrganizationType)
 
     def resolve_health(root, info):
         return "ok"
-
-    def resolve_organizations(root, info):
-        return Organization.objects.all()
 
 
 schema = graphene.Schema(query=Query)
