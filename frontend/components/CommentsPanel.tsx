@@ -12,8 +12,11 @@ import { useOrg } from "@/context/OrgContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
+import { cn } from "@/lib/utils";
 
 /* ================= TYPES ================= */
+
+type TaskStatus = "TODO" | "IN_PROGRESS" | "DONE";
 
 interface TaskComment {
   id: string;
@@ -31,9 +34,24 @@ interface GetTaskCommentsVars {
   taskId: string;
 }
 
+/* ================= STATUS COLOR MAP ================= */
+
+const statusStyles: Record<TaskStatus, string> = {
+  TODO: "border-slate-200 bg-slate-50 dark:border-slate-800 dark:bg-slate-900/40",
+  IN_PROGRESS:
+    "border-blue-200 bg-blue-50 dark:border-blue-900 dark:bg-blue-950/40",
+  DONE: "border-green-200 bg-green-50 dark:border-green-900 dark:bg-green-950/40",
+};
+
 /* ================= COMPONENT ================= */
 
-export function CommentsPanel({ taskId }: { taskId: string }) {
+export function CommentsPanel({
+  taskId,
+  status,
+}: {
+  taskId: string;
+  status: TaskStatus;
+}) {
   const [text, setText] = useState("");
   const [open, setOpen] = useState(false);
   const { orgSlug } = useOrg();
@@ -74,7 +92,10 @@ export function CommentsPanel({ taskId }: { taskId: string }) {
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.25, ease: "easeOut" }}
-            className='mt-2 overflow-hidden rounded-lg border bg-muted/30'
+            className={cn(
+              "mt-2 overflow-hidden rounded-lg border",
+              statusStyles[status]
+            )}
           >
             <div className='space-y-3 p-3'>
               {loading && (

@@ -1,17 +1,23 @@
 "use client";
 
+import { useQuery, useMutation } from "@apollo/client/react";
+import { motion } from "framer-motion";
+
 import { GET_TASKS } from "@/graphql/queries";
 import { UPDATE_TASK_STATUS } from "@/graphql/mutations";
-import { useMutation, useQuery } from "@apollo/client/react";
 import { CommentsPanel } from "./CommentsPanel";
 import { useOrg } from "@/context/OrgContext";
 
+import { cn } from "@/lib/utils";
+
 /* ================= TYPES ================= */
+
+type TaskStatus = "TODO" | "IN_PROGRESS" | "DONE";
 
 interface Task {
   id: string;
   title: string;
-  status: "TODO" | "IN_PROGRESS" | "DONE";
+  status: TaskStatus;
   assigneeEmail?: string;
 }
 
@@ -23,6 +29,15 @@ interface GetTasksVars {
   organizationSlug: string;
   projectId: string;
 }
+
+/* ================= STATUS STYLES ================= */
+
+const taskStyles: Record<TaskStatus, string> = {
+  TODO: "border-slate-200 bg-slate-50 dark:border-slate-800 dark:bg-slate-900/40",
+  IN_PROGRESS:
+    "border-blue-200 bg-blue-50 dark:border-blue-900 dark:bg-blue-950/40",
+  DONE: "border-green-200 bg-green-50 dark:border-green-900 dark:bg-green-950/40",
+};
 
 /* ================= COMPONENT ================= */
 
@@ -39,34 +54,53 @@ export function TaskList({ projectId }: { projectId: string }) {
     }
   );
 
-  const [updateStatus] = useMutation(UPDATE_TASK_STATUS);
+  const [updateStatus] = useMutation(UPDATE_TASK_STATUS, {
+    refetchQueries: ["GetProjects"],
+  });
 
-  if (loading) return <p>Loading tasks...</p>;
-  if (error) return <p className='text-red-500'>Error loading tasks</p>;
+  if (loading)
+    return <p className='text-sm text-muted-foreground'>Loading tasks…</p>;
+
+  if (error)
+    return <p className='text-sm text-destructive'>Error loading tasks</p>;
 
   return (
     <div className='mt-4 space-y-2'>
       {data?.tasks.map((task) => (
-        <div
+        <motion.div
           key={task.id}
-          className='p-3 bg-gray-50 rounded flex justify-between items-start'
+          layout
+          transition={{ duration: 0.25, ease: "easeOut" }}
+          className={cn(
+            "rounded-lg border p-3 flex justify-between items-start",
+            taskStyles[task.status]
+          )}
         >
-          <div>
-            <p className='font-medium'>{task.title}</p>
-            <p className='text-xs text-gray-500'>{task.assigneeEmail}</p>
+          {/* Left */}
+          <div className='space-y-1'>
+            <p className='text-sm font-medium leading-tight'>{task.title}</p>
 
-            <CommentsPanel taskId={task.id} />
+            {task.assigneeEmail && (
+              <p className='text-xs text-muted-foreground'>
+                {task.assigneeEmail}
+              </p>
+            )}
+
+            <CommentsPanel taskId={task.id} status={task.status} />
           </div>
 
+          {/* Right */}
           <select
-            className='border rounded px-2 py-1 text-sm'
+            className='rounded-md border bg-background px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-ring'
             value={task.status}
             onChange={(e) => {
+              const newStatus = e.target.value as TaskStatus;
+
               updateStatus({
                 variables: {
                   organizationSlug: orgSlug,
                   taskId: task.id,
-                  status: e.target.value,
+                  status: newStatus,
                 },
                 optimisticResponse: {
                   updateTaskStatus: {
@@ -74,11 +108,10 @@ export function TaskList({ projectId }: { projectId: string }) {
                     task: {
                       __typename: "TaskType",
                       id: task.id,
-                      status: e.target.value,
+                      status: newStatus,
                     },
                   },
                 },
-                refetchQueries: ["GetProjects"],
               });
             }}
           >
@@ -86,7 +119,7 @@ export function TaskList({ projectId }: { projectId: string }) {
             <option value='IN_PROGRESS'>IN PROGRESS</option>
             <option value='DONE'>DONE</option>
           </select>
-        </div>
+        </motion.div>
       ))}
     </div>
   );

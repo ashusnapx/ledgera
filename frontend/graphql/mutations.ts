@@ -36,3 +36,25 @@ export const ADD_TASK_COMMENT = gql`
     }
   }
 `;
+
+export const CREATE_PROJECT = gql`
+  mutation CreateProject(
+    $organizationSlug: String!
+    $name: String!
+    $description: String
+  ) {
+    createProject(
+      organizationSlug: $organizationSlug
+      name: $name
+      description: $description
+    ) {
+      project {
+        id
+        name
+        status
+        taskCount
+        completionRate
+      }
+    }
+  }
+`;

@@ -2,6 +2,7 @@
 
 import { OrgSwitcher } from "./OrgSwitcher";
 import { ModeToggle } from "./ModeToggle";
+import { CreateProjectDialog } from "./CreateProjectDialog";
 
 export function TopBar() {
 
@@ -12,9 +13,9 @@ export function TopBar() {
 
         <div className='flex items-center gap-3'>
           <OrgSwitcher />
-              </div>
-              
-              <ModeToggle/>
+          <CreateProjectDialog />
+          <ModeToggle />
+        </div>
       </div>
     </header>
   );

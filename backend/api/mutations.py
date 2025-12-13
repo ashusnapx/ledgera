@@ -15,17 +15,23 @@ class CreateProject(graphene.Mutation):
         organization_slug = graphene.String(required=True)
         name = graphene.String(required=True)
         description = graphene.String()
-        status = graphene.String()
         due_date = graphene.Date()
 
-    def mutate(self, info, organization_slug, name, description=None, status=None, due_date=None):
+    def mutate(
+        self,
+        info,
+        organization_slug,
+        name,
+        description=None,
+        due_date=None,
+    ):
         org = get_organization_or_error(organization_slug)
 
         project = Project.objects.create(
             organization=org,
             name=name,
             description=description or "",
-            status=status or Project._meta.get_field("status").default,
+            status=Project._meta.get_field("status").default,
             due_date=due_date,
         )
 
