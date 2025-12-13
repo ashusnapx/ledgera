@@ -1,24 +1,26 @@
 import graphene
 
-from api.queries import ProjectQuery, TaskQuery, TaskCommentQuery
+from api.queries import ProjectQuery, TaskQuery, TaskCommentQuery, OrganizationQuery
 
 from api.mutations import (
     CreateProject,
     UpdateProject,
     CreateTask,
     UpdateTaskStatus,
-    AddTaskComment
+    AddTaskComment,
+    CreateOrganization
 )
 
 
 
-class Query(ProjectQuery, TaskQuery, TaskCommentQuery, graphene.ObjectType):
+class Query(OrganizationQuery, ProjectQuery, TaskQuery, TaskCommentQuery, graphene.ObjectType):
     health = graphene.String()
 
     def resolve_health(self, info):
         return "ok"
     
 class Mutation(graphene.ObjectType):
+    create_organization = CreateOrganization.Field()
     create_project = CreateProject.Field()
     update_project = UpdateProject.Field()
     create_task = CreateTask.Field()

@@ -4,17 +4,18 @@ from api.types import ProjectType
 from core.organization import get_organization_or_error
 from core.querysets import projects_for_org
 from core.graphql_errors import graphql_error_from_exception
-
 from api.types import TaskType
 from projects.models import Project
 from core.querysets import (
     tasks_for_org,
     validate_project_belongs_to_org,
 )
-
 from api.types import TaskCommentType
 from tasks.models import Task
 from core.querysets import validate_task_belongs_to_org
+from organizations.models import Organization
+from api.types import OrganizationType
+from core.organization import get_organization_or_error
 
 class ProjectQuery(graphene.ObjectType):
     projects = graphene.List(
@@ -70,3 +71,15 @@ def resolve_projects(self, info, organization_slug):
         return projects_for_org(org)
     except Exception as exc:
         raise graphql_error_from_exception(exc)
+
+class OrganizationQuery(graphene.ObjectType):
+    organizations = graphene.List(OrganizationType)
+    organization = graphene.Field(
+        OrganizationType, slug=graphene.String(required=True)
+    )
+
+    def resolve_organizations(self, info):
+        return Organization.objects.all()
+
+    def resolve_organization(self, info, slug):
+        return get_organization_or_error(slug)

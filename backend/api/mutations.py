@@ -1,12 +1,14 @@
 import graphene
 
-from api.types import ProjectType, TaskType
+from api.types import ProjectType, TaskType, OrganizationType
 from projects.models import Project
 from tasks.models import Task
 from core.organization import get_organization_or_error
 from core.querysets import validate_project_belongs_to_org
 from comments.models import TaskComment
 from core.querysets import validate_task_belongs_to_org
+from organizations.models import Organization
+from django.utils.text import slugify
 
 class CreateProject(graphene.Mutation):
     project = graphene.Field(ProjectType)
@@ -145,3 +147,27 @@ class AddTaskComment(graphene.Mutation):
         )
 
         return AddTaskComment(comment=comment.content)
+
+class CreateOrganization(graphene.Mutation):
+    organization = graphene.Field(OrganizationType)
+
+    class Arguments:
+        name = graphene.String(required=True)
+        contact_email = graphene.String(required=True)
+
+    def mutate(self, info, name, contact_email):
+        base_slug = slugify(name)
+        slug = base_slug
+        counter = 1
+
+        while Organization.objects.filter(slug=slug).exists():
+            slug = f"{base_slug}-{counter}"
+            counter += 1
+
+        organization = Organization.objects.create(
+            name=name,
+            slug=slug,
+            contact_email=contact_email,
+        )
+
+        return CreateOrganization(organization=organization)
